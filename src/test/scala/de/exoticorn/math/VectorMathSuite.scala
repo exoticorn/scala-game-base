@@ -40,6 +40,63 @@ class VectorMathSuite extends FunSuite {
     assert_eqf(cos * cos + sin * sin, 1)
     assert_eqv(Vector3.xAxis crossProduct Vector3.yAxis, Vector3.zAxis)
   }
+  
+  test("Matrix22 unit") {
+    assert_unit22(Matrix22.unit)
+  }
+  
+  test("Matrix22 transpose") {
+    val m = Matrix22(Vector2(1, 2), Vector2(3, 4)).transpose
+    assert_eqv2(m.x, Vector2(1, 3))
+    assert_eqv2(m.y, Vector2(2, 4))
+  }
+  
+  test("Matrix22 mulvec") {
+    val m = Matrix22(Vector2(1, 2), Vector2(3, 4))
+    assert_eqv2(m * Vector2(5, 6), Vector2(23, 34))
+  }
+  
+  test("Matrix22 mulmat") {
+    val m1 = Matrix22(Vector2(1, 2), Vector2(3, 4))
+    val m2 = Matrix22(Vector2(5, 6), Vector2(7, 8))
+    val r = m1 * m2
+    assert_eqv2(r.x, Vector2(23, 34))
+    assert_eqv2(r.y, Vector2(31, 46))
+  }
+  
+  test("Matrix22 scale") {
+    val m = Matrix22(Vector2(1, 2), Vector2(3, 4)) * 2
+    assert_eqv2(m.x, Vector2(2, 4))
+    assert_eqv2(m.y, Vector2(6, 8))
+  }
+  
+  test("Matrix22 inverse") {
+    val m = Matrix22(Vector2(1, 2), Vector2(-3, 4))
+    assert_unit22(m * m.inverse)
+  }
+
+  test("Matrix32 unit") {
+    assert_unit32(Matrix32.unit)
+  }
+  
+  test("Matrix32 mulvec") {
+    val m = Matrix32(Vector2(1, 2), Vector2(3, 4), Vector2(7, 8))
+    assert_eqv2(m * Vector2(5, 6), Vector2(30, 42))
+  }
+
+  test("Matrix32 mulmat") {
+    val m1 = Matrix32(Vector2(1, 2), Vector2(3, 4), Vector2(9, 10))
+    val m2 = Matrix32(Vector2(5, 6), Vector2(7, 8), Vector2(11, 12))
+    val r = m1 * m2
+    assert_eqv2(r.rot.x, Vector2(23, 34))
+    assert_eqv2(r.rot.y, Vector2(31, 46))
+    assert_eqv2(r.pos, Vector2(11+12*3+9, 11*2+12*4+10))
+  }
+
+  test("Matrix32 inverse") {
+    val m = Matrix32(Vector2(1, 2), Vector2(-3, 4), Vector2(5, 6))
+    assert_unit32(m * m.inverse)
+  }
 
   test("Matrix33 unit") {
     assert_unit33(Matrix33.unit)
@@ -231,6 +288,16 @@ object VectorMathSuite {
        math.abs(a.w - b.w) > epsilon) {
 	 throw new AssertionError("%s != %s".format(a, b))
        }
+  }
+  
+  def assert_unit22(m: Matrix22, epsilon: Double = 0.001) {
+    assert_eqv2(m.x, Vector2.xAxis, epsilon)
+    assert_eqv2(m.y, Vector2.yAxis, epsilon)
+  }
+
+  def assert_unit32(m: Matrix32, epsilon: Double = 0.001) {
+    assert_unit22(m.rot, epsilon)
+    assert_eqv2(m.pos, Vector2(0, 0), epsilon)
   }
 
   def assert_unit33(m: Matrix33, epsilon: Double = 0.001) {

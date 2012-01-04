@@ -1,4 +1,4 @@
-name := "modelreader"
+name := "scala-game-base"
 
 version := "0.0"
 
